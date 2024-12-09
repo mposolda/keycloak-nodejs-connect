@@ -1,0 +1,37 @@
+name: X Release
+
+on:
+  workflow_call:
+    inputs:
+      gh-org:
+        required: true
+        type: string
+      branch:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
+    secrets:
+      GH_TOKEN:
+        required: true
+#     TODO:mposolda uncomment
+#      NPM_TOKEN:
+#        required: true
+
+concurrency: rel-${{ github.ref }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  show-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Github organization: ${{ inputs.gh-org }}  " >> $GITHUB_STEP_SUMMARY
+          echo "Branch: ${{ inputs.branch }}  " >> $GITHUB_STEP_SUMMARY
+          echo "Target tag: ${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
+          echo "Ref: ${{ github.ref }}  " >> $GITHUB_STEP_SUMMARY
