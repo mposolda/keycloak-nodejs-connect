@@ -1,0 +1,21 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version
+        required: true
+
+jobs:
+
+  release:
+    name: Release
+    uses: ./.github/workflows/x-release.yml
+    with:
+      gh-org: mposolda # TODO:mposolda remove or update this
+      branch: ${{ github.ref_name }}
+      tag: ${{ inputs.version }}
+      set-versions: true
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
