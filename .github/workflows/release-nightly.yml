@@ -15,6 +15,6 @@ jobs:
       gh-org: mposolda
       branch: main
       tag: nightly
-      set-versions: false
+      nightly: true
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}

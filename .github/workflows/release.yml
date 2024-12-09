@@ -16,6 +16,6 @@ jobs:
       gh-org: mposolda # TODO:mposolda remove or update this
       branch: ${{ github.ref_name }}
       tag: ${{ inputs.version }}
-      set-versions: true
+      nightly: false
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}

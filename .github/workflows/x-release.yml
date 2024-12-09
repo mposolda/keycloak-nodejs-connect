@@ -12,7 +12,7 @@ on:
       tag:
         required: true
         type: string
-      set-versions:
+      nightly:
         required: true
         type: boolean
     secrets:
@@ -37,20 +37,18 @@ jobs:
           echo "Github organization: ${{ inputs.gh-org }}  " >> $GITHUB_STEP_SUMMARY
           echo "Branch: ${{ inputs.branch }}  " >> $GITHUB_STEP_SUMMARY
           echo "Target tag: ${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
-          echo "Set versions: ${{ inputs.set-versions }}  " >> $GITHUB_STEP_SUMMARY
+          echo "Is nightly build: ${{ inputs.nightly }}  " >> $GITHUB_STEP_SUMMARY
 
-  release-impl:
+  create-tags:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-#          repository: "${{ inputs.gh-org }}/keycloak-nodejs-connect"
-#          token: ${{ secrets.GH_TOKEN }}
           ref: ${{ inputs.branch }}
 
       - name: Create version commit
-        if: inputs.set-versions
+        if: ${{ !inputs.nightly }}
         run: |
           ./set-version.sh ${{ inputs.tag }}
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -63,10 +61,32 @@ jobs:
       - name: Push changes
         run: git push --force origin refs/tags/${{ inputs.tag }}
 
+  create-gh-releases:
+    runs-on: ubuntu-latest
+    needs: [create-tags]
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    steps:
+      - name: Check if release exists
+        id: release-exists
+        run: >
+          echo "release-exists=$(
+            if ( gh release view ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak-nodejs-connect &> /dev/null ); then
+              echo 'true'
+            else
+              echo 'false'
+            fi
+          )" >> $GITHUB_ENV
+
+      - name: Create a release
+        if: env.release-exists == 'false'
+        run: gh release create ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak-nodejs-connect --title ${{ inputs.tag }} --draft ${{ inputs.nightly && '--prerelease' || '' }}
+
+
   show-output:
     name: Show Output
     runs-on: ubuntu-latest
-    needs: [release-impl]
+    needs: [create-tags,create-gh-releases]
     steps:
       - run: |
           echo "https://github.com/${{ inputs.gh-org }}/keycloak-nodejs-connect/tree/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY        
