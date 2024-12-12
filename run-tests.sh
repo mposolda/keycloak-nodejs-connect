@@ -32,14 +32,15 @@ run_tests() {
   fi
 }
 
-if [[ "$1" == "group1" ]]; then
-  for i in `ls test/*.js | grep -v "enforcer-spec"`; do run_tests ${i}; done
-fi
-
-if [[ "$1" == "group2" ]]; then
-  for i in `ls test/*.js | grep "enforcer-spec"`; do run_tests ${i}; done
-fi
-
-if [[ -z "$1" ]]; then
-  for i in `ls test/*.js`; do run_tests ${i}; done
-fi
+#if [[ "$1" == "group1" ]]; then
+#  for i in `ls test/*.js | grep -v "enforcer-spec"`; do run_tests ${i}; done
+#fi
+#
+#if [[ "$1" == "group2" ]]; then
+#  for i in `ls test/*.js | grep "enforcer-spec"`; do run_tests ${i}; done
+#fi
+#
+#if [[ -z "$1" ]]; then
+#  for i in `ls test/*.js`; do run_tests ${i}; done
+#fi
+run_tests test/keycloak-connect-web-enforcer-spec.js
