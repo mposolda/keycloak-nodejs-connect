@@ -45,6 +45,7 @@ jobs:
         with:
           node-version: 22
           check-latest: true
+          registry-url: https://registry.npmjs.org
 
       - name: Create version commit
         if: ${{ !inputs.nightly }}
@@ -93,34 +94,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  publish-npm:
-    runs-on: ubuntu-latest
-    needs: [release-impl]
-    if: ${{ !inputs.nightly }}
-    steps:
-      - name: Download archive
-        run: gh release download ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak-nodejs-connect --pattern 'keycloak-nodejs-connect.tgz'
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          check-latest: true
-          registry-url: https://registry.npmjs.org
-
       - name: Publish to NPM
-        run: npm publish keycloak-nodejs-connect.tgz --access public --ignore-scripts ${{ inputs.gh-org != 'keycloak' && ' --dry-run' || '' }}
+        if: ${{ !inputs.nightly }}
+        run: npm publish keycloak-nodejs-conneect.tgz --access public --ignore-scripts ${{ inputs.gh-org != 'keycloak' && ' --dry-run' || '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-
-  show-output:
-    name: Show Output
-    runs-on: ubuntu-latest
-    needs: [release-impl]
-    steps:
-      - run: |
+      - name: Show Output
+        run: |
           echo "https://github.com/${{ inputs.gh-org }}/keycloak-nodejs-connect/tree/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
           echo "https://github.com/${{ inputs.gh-org }}/keycloak-nodejs-connect/releases/tag/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
