@@ -29,21 +29,29 @@ defaults:
 
 jobs:
 
-  create-tags:
+  release-impl:
     runs-on: ubuntu-latest
+    # TODO:mposolda Needed for "gh"
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.branch }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          check-latest: true
+
       - name: Create version commit
         if: ${{ !inputs.nightly }}
-        run: |
-          ./set-version.sh ${{ inputs.tag }}
+        run: |          
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          git commit -a -m "Set version to ${{ inputs.tag }}"
+          npm version ${{ inputs.tag }} -m "Set version to ${{ inputs.tag }}"          
 
       - name: Tag commit
         run: git tag ${{ inputs.tag }}
@@ -51,12 +59,6 @@ jobs:
       - name: Push changes
         run: git push --force origin refs/tags/${{ inputs.tag }}
 
-  create-gh-releases:
-    runs-on: ubuntu-latest
-    needs: [create-tags]
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-    steps:
       - name: Check if release exists
         id: release-exists
         run: >
@@ -72,20 +74,11 @@ jobs:
         if: env.release-exists == 'false'
         run: gh release create ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak-nodejs-connect --title ${{ inputs.tag }} --draft ${{ inputs.nightly && '--prerelease' || '' }}
 
-  release-on-github:
-    runs-on: ubuntu-latest
-    needs: [create-gh-releases]
-    steps:
+      # TODO:mposolda is this needed?
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.tag }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          check-latest: true
 
       - name: Create package tarball
         run: |
@@ -103,7 +96,7 @@ jobs:
 
   publish-gh-release:
     runs-on: ubuntu-latest
-    needs: [release-on-github]
+    needs: [release-impl]
     steps:
       - name: Publish release
         run: gh release edit ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak-nodejs-connect --draft=false
@@ -112,7 +105,7 @@ jobs:
 
   publish-npm:
     runs-on: ubuntu-latest
-    needs: [release-on-github]
+    needs: [release-impl]
     if: ${{ !inputs.nightly }}
     steps:
       - name: Download archive
@@ -136,7 +129,7 @@ jobs:
   show-output:
     name: Show Output
     runs-on: ubuntu-latest
-    needs: [create-tags,publish-gh-release]
+    needs: [release-impl,publish-gh-release]
     steps:
       - run: |
           echo "https://github.com/${{ inputs.gh-org }}/keycloak-nodejs-connect/tree/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
