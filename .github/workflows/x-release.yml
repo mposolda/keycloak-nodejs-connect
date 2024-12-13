@@ -29,15 +29,6 @@ defaults:
 
 jobs:
 
-  show-inputs:
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          echo "Github organization: ${{ inputs.gh-org }}  " >> $GITHUB_STEP_SUMMARY
-          echo "Branch: ${{ inputs.branch }}  " >> $GITHUB_STEP_SUMMARY
-          echo "Target tag: ${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
-          echo "Is nightly build: ${{ inputs.nightly }}  " >> $GITHUB_STEP_SUMMARY
-
   create-tags:
     runs-on: ubuntu-latest
     steps:
@@ -55,7 +46,7 @@ jobs:
           git commit -a -m "Set version to ${{ inputs.tag }}"
 
       - name: Tag commit
-        run: git tag --force ${{ inputs.tag }}
+        run: git tag ${{ inputs.tag }}
 
       - name: Push changes
         run: git push --force origin refs/tags/${{ inputs.tag }}
