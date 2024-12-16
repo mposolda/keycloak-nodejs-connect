@@ -69,10 +69,10 @@ jobs:
             else
               echo 'false'
             fi
-          )" >> $GITHUB_ENV
+          )" >> "$GITHUB_OUTPUT"
 
       - name: Create a github release
-        if: env.release-exists == 'false'
+        if: steps.release-exists.outputs.release-exists == 'false'
         run: gh release create ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak-nodejs-connect --title ${{ inputs.tag }} --draft ${{ inputs.nightly && '--prerelease' || '' }}
 
       - name: Create package tarball
