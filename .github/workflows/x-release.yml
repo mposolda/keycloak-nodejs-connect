@@ -32,8 +32,8 @@ jobs:
   release-impl:
     runs-on: ubuntu-latest
     # TODO:mposolda Needed for "gh"
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#    env:
+#      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -86,13 +86,13 @@ jobs:
             test -f $i || gh release delete-asset ${{ inputs.tag }} $i -y
           done
           gh release upload ${{ inputs.tag }} keycloak-nodejs-connect.tgz --clobber
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        env:
+#          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish release
         run: gh release edit ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak-nodejs-connect --draft=false
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        env:
+#          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to NPM
         if: ${{ !inputs.nightly }}
