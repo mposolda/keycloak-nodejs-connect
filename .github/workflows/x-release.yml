@@ -16,8 +16,6 @@ on:
         required: true
         type: boolean
     secrets:
-#      GH_TOKEN:
-#        required: true
       NPM_TOKEN:
         required: false
 
@@ -31,9 +29,6 @@ jobs:
 
   release-impl:
     runs-on: ubuntu-latest
-    # TODO:mposolda Needed for "gh"
-#    env:
-#      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -96,13 +91,17 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Show Output Github
+        run: |
+          echo "https://github.com/${{ inputs.gh-org }}/keycloak-nodejs-connect/tree/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
+          echo "https://github.com/${{ inputs.gh-org }}/keycloak-nodejs-connect/releases/tag/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
+
       - name: Publish to NPM
         if: ${{ !inputs.nightly }}
         run: npm publish keycloak-nodejs-connect.tgz --access public --ignore-scripts ${{ inputs.gh-org != 'keycloak' && ' --dry-run' || '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Show Output
-        run: |
-          echo "https://github.com/${{ inputs.gh-org }}/keycloak-nodejs-connect/tree/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
-          echo "https://github.com/${{ inputs.gh-org }}/keycloak-nodejs-connect/releases/tag/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
+      - name: Show Output NPM
+        if: ${{ !inputs.nightly && inputs.gh-org == 'mposolda' }} # TODO:mposolda update to keycloak
+        run: echo "https://www.npmjs.com/package/keycloak-connect/v/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
