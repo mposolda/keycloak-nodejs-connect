@@ -103,5 +103,5 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Show Output NPM
-        if: ${{ !inputs.nightly && inputs.gh-org == 'mposolda' }} # TODO:mposolda update to keycloak
+        if: ${{ !inputs.nightly && inputs.gh-org == 'keycloak' }}
         run: echo "https://www.npmjs.com/package/keycloak-connect/v/${{ inputs.tag }}  " >> $GITHUB_STEP_SUMMARY
