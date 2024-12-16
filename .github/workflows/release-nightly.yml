@@ -16,5 +16,5 @@ jobs:
       branch: ${{ github.ref_name }}
       tag: nightly
       nightly: true
-    secrets:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#    secrets:
+#      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

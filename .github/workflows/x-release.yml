@@ -16,8 +16,8 @@ on:
         required: true
         type: boolean
     secrets:
-      GH_TOKEN:
-        required: true
+#      GH_TOKEN:
+#        required: true
       NPM_TOKEN:
         required: false
 
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     # TODO:mposolda Needed for "gh"
     env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -87,12 +87,12 @@ jobs:
           done
           gh release upload ${{ inputs.tag }} keycloak-nodejs-connect.tgz --clobber
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish release
         run: gh release edit ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak-nodejs-connect --draft=false
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to NPM
         if: ${{ !inputs.nightly }}
