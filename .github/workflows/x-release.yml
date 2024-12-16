@@ -74,6 +74,8 @@ jobs:
       - name: Create a github release
         if: steps.release-exists.outputs.release-exists == 'false'
         run: gh release create ${{ inputs.tag }} --repo ${{ inputs.gh-org }}/keycloak-nodejs-connect --title ${{ inputs.tag }} --draft ${{ inputs.nightly && '--prerelease' || '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create package tarball
         run: |
