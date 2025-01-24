@@ -13,7 +13,7 @@ jobs:
     name: Release
     uses: ./.github/workflows/x-release.yml
     with:
-      gh-org: keycloak
+      gh-org: mposolda
       branch: ${{ github.ref_name }}
       tag: ${{ inputs.version }}
       nightly: false
